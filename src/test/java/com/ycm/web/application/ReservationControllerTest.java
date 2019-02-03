@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.text.DateFormat;
@@ -22,19 +23,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(ReservationController.class)
-public class ReservationControllerTest {
+@RunWith(SpringRunner.class)
+@WebMvcTest(ReservationController.class)    //test against this controller
+class ReservationControllerTest {
 
-    @MockBean
-    private ReservationService reservationService;
+    //MockMvc is Spring MVC test engine
+    //@MockBean add mock objects to the spring application context
+    //@Test performs the testing for a specific scenario
+
     @Autowired
     private MockMvc mockMvc;
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    //underlying service we need to mock to test the V+C components
+    //note that the mocks are reset after each test method
+    @MockBean
+    private ReservationService reservationService;
 
     @Test
     public void getReservations() throws Exception {
+        //prepare the input and expected output objects
         String testDateString = "2017-01-01";
         Date testDate = DATE_FORMAT.parse(testDateString);
         List<RoomReservation> mockReservationList = new ArrayList<>();
@@ -48,17 +55,21 @@ public class ReservationControllerTest {
         mockRoomReservation.setRoomName("JUnit Room");
         mockReservationList.add(mockRoomReservation);
 
-        //basically here we are saying, for the mockBean reservationService
-        //if i call getRoomReservationsForDate with actual runtime argument 'testDate'
-        //it should return mockReservationList
+        //feed the input/output objects to the mock service
+        //from frontend to backend, the flow is
+        //user -> Web Front View -> ReservationController -> ReservationService -> Data
+        //        (checked)         (being tested)           (mocked)
         given(reservationService.getRoomReservationsForDate(testDateString)).willReturn(mockReservationList);
 
-        //give the above assumption, we want to test if we see some data on the view
+        //give the above mocked service, we want to make sure if we get some data on the view
         //in other words, we are testing the view+controller (VC) with a mocked model (M)
         this.mockMvc.perform(get("/reservations?date=2017-01-01"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Test, JUnit")));
 
         //by the way, get() status() content() are three static utility methods
+        //they are imported via 'import static xxx‘
     }
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 }

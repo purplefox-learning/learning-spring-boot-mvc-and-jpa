@@ -26,6 +26,9 @@ apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
+group = artifactGroup
+version = artifactVersion
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -64,7 +67,6 @@ dependencies {
     //if we need database
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     runtimeOnly('com.h2database:h2')
-    //runtimeOnly('org.apache.derby:derby')
 
     //good-to-have spring boot
     implementation('org.springframework.boot:spring-boot-starter-actuator')

@@ -18,7 +18,7 @@ public class ReservationServiceController {
     private ReservationService reservationService;
 
     @RequestMapping(method= RequestMethod.GET, value="/reservations/{date}")
-    public List<RoomReservation> getAllReservationsForDate(@PathVariable(value="date")String dateString){
+    public List<RoomReservation> getAllReservationsForDate(@PathVariable(value="date") String dateString){
         return reservationService.getRoomReservationsForDate(dateString);
     }
 }
